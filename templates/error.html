@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>An error occurred.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .error-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .error-box i {
+            font-size: 70px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        .error-box h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .error-box p {
+            color: #6c757d;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
+        .error-box button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .error-box button:hover {
+            background: #bb2d3b;
+        }
+        
+        a {
+            text-decoration: none;
+            color: #fff;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div class="error-box">
+    <i class="fa-solid fa-wifi-slash"></i>
+    <h1>An error occurred.</h1>
+    <p>Please check the internet connection.</p>
+    <button><a href="{% url 'blog:index' %}">check</a></button>
+</div>
+
+</body>
+</html>

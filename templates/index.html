@@ -1,0 +1,298 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DevBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="{% static 'style.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+<style>
+/* ================= GENERAL ================= */
+body {
+  background:#f8f9fa;
+  transition:.3s;
+  color:#212529;
+}
+
+body.dark {
+  background:#121212;
+  color:#eee;
+}
+
+body.dark .card,body.dark .cat-bar,body.dark .pagination .page-item .page-link {
+  background:#1e1e1e;
+  border-color:#333;
+  color:#fff;
+}
+
+body.dark .navbar,body.dark footer {
+  background:#000 !important;
+}
+
+body.dark .text-muted {
+  color:#aaa !important;
+}
+
+/* ================= NAVBAR ================= */
+.nav-actions {
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.lang-btn{
+  font-size:11px;
+  padding:3px 6px;
+  border-radius:6px;
+  border:1px solid #444;
+  background:#222;
+  color:#fff;
+  cursor:pointer;
+}
+
+.lang-btn.active{
+  background:#0d6efd;
+  border-color:#0d6efd;
+}
+
+.theme-btn{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+
+/* ================= CATEGORIES ================= */
+.cat-bar{
+  position:sticky;
+  top:56px;
+  z-index:1030;
+  background:#fff;
+  border-bottom:1px solid #dee2e6;
+}
+
+body.dark .cat-bar{
+  background:#1e1e1e;
+  border-color:#333;
+}
+
+.cat-scroll{
+  overflow-x:auto;
+  white-space:nowrap;
+  padding:8px 0;
+}
+
+.cat-tab{
+  padding:6px 14px;
+  border-radius:20px;
+  background:#f8f9fa;
+  border:1px solid #dee2e6;
+  color:#212529;
+  font-size:14px;
+  text-decoration:none;
+}
+
+body.dark .cat-tab{
+  background:#2a2a2a;
+  border-color:#444;
+  color:#eee;
+}
+
+.cat-tab:hover{
+  background:#0d6efd;
+  color:#fff;
+}
+
+.cat-count{
+  margin-left:6px;
+  font-size:12px;
+  background:#0d6efd;
+  color:#fff;
+  padding:2px 7px;
+  border-radius:10px;
+}
+
+/* ================= SEARCH ================= */
+.search-form {
+  display:flex;
+  gap:4px;
+}
+
+.search-form input {
+  flex:1;
+}
+
+/* ================= PAGINATION ================= */
+.pagination .page-item .page-link {
+  color:#0d6efd;
+  background:#fff;
+  border:1px solid #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+  background:#0d6efd;
+  color:#fff;
+  border-color:#0d6efd;
+}
+
+body.dark .pagination .page-item .page-link {
+  background:#1e1e1e;
+  border-color:#333;
+  color:#eee;
+}
+
+body.dark .pagination .page-item.active .page-link {
+  background:#0d6efd;
+  color:#fff;
+  border-color:#0d6efd;
+}
+
+</style>
+</head>
+
+<body>
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+    <a class="navbar-brand fw-bold" href="/">DevBlog</a>
+
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="nav">
+    <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link {% if not active_category %}active{% endif %}" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'blog:about' %}">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'blog:contact' %}">Contact</a></li>
+    </ul>
+
+<form class="search-form me-2" action="{% url 'blog:search' %}" method="get">
+    <input name="query" class="form-control form-control-sm" placeholder="Search">
+    <button class="btn btn-outline-success btn-sm" type="submit">Search</button>
+</form>
+
+<!-- ================= LANG + THEME ================= -->
+
+<div class="nav-actions">
+    <button class="lang-btn active" onclick="setLang('uz')">UZ</button>
+    <button class="lang-btn" onclick="setLang('ru')">RU</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="btn btn-outline-light theme-btn" id="themeToggle">
+    <i id="themeIcon" class="bi bi-moon-fill"></i>
+    </button>
+</div>
+</div>
+</div>
+</nav>
+
+<!-- ================= CATEGORIES ================= -->
+
+<div class="container-fluid cat-bar">
+    <div class="container">
+        <div class="d-flex gap-2 cat-scroll">
+            {% for cat in categories %}
+        <a href="{% url 'blog:category_list' cat.slug %}" class="cat-tab">{{ cat.name }}
+            <span class="cat-count">{{ cat.categories.count }}</span>
+        </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- ================= MAIN ================= -->
+
+<div class="container mt-4">
+    <div class="row">
+
+    <div class="col-md-8">
+        {% for post in page_obj %}
+        <div class="card mb-4 shadow-sm">
+        <a href="{% url 'blog:detail' post.id %}" class="text-decoration-none" data-read>
+        {% if post.image %}
+        <img src="{{ post.image.url }}" class="card-img-top" style="height:260px;object-fit:cover;">
+        {% endif %}
+
+        <div class="card-body">
+            <h4 class="fw-bold">{{ post.title }}</h4>
+            <p class="text-muted">{{ post.body|truncatewords:25 }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+            <div>
+            <span class="badge bg-primary"><i class="bi bi-eye"></i> {{ post.views }}</span>
+            <span class="badge bg-primary"><i class="bi bi-chat"></i> {{ post.comments.count }}</span>
+            <span class="badge bg-primary"><i class="bi bi-list-stars"></i> {{ post.ratings.all.count }}</span>
+        </div>
+            <a href="{% url 'blog:detail' post.id %}" class="btn btn-sm btn-outline-primary" data-read>Read</a>
+        </div>
+    </div>
+</div>
+    {% endfor %}
+
+<!-- ================= PAGINATION ================= -->
+
+<nav>
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        </li>
+        {% endif %}
+
+        {% for page in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == page %}active{% endif %}">
+            <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+        </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+</div>
+
+<div class="col-md-4">
+    <div class="card mb-4">
+    <div class="card-header fw-bold">ℹ️ About</div>
+    <div class="card-body small text-muted">DevBlog -- Programming and technology news</div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="bg-dark text-white-50 text-center py-3 mt-5">© 2026 DevBlog</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ===== DARK MODE ===== */
+
+const body=document.body;
+const icon=document.getElementById("themeIcon");
+
+if(localStorage.getItem("theme")==="dark"){
+ body.classList.add("dark");
+ icon.className="bi bi-sun-fill";
+}
+
+document.getElementById("themeToggle").onclick=()=>{
+ body.classList.toggle("dark");
+ const dark=body.classList.contains("dark");
+ localStorage.setItem("theme",dark?"dark":"light");
+ icon.className=dark?"bi bi-sun-fill":"bi bi-moon-fill";
+};
+</script>
+
+</body>
+</html>
